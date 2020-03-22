@@ -29,12 +29,15 @@ namespace MySql.Powershell
         [Parameter]
         public int QueryTimeout { get; set; } = 0;
 
+        [Parameter]
+        public bool AllowUserVariables { get; set; } = false;
+
         protected string connectionString { get; private set; }
 
         protected override void BeginProcessing()
         {
             WriteVerbose("Building Connection");
-            connectionString = new MySqlConnectionStringBuilder { Server = ServerInstance, Port = Port, Database = Database, UserID = Username, Password = Password }.ConnectionString;
+            connectionString = new MySqlConnectionStringBuilder { Server = ServerInstance, Port = Port, Database = Database, UserID = Username, Password = Password, AllowUserVariables = AllowUserVariables }.ConnectionString;
         }
 
         public void ProcessInternal()

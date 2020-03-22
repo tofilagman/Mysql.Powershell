@@ -36,5 +36,11 @@ namespace MySql.Powershell
             WriteVerbose("Building Connection");
             connectionString = new MySqlConnectionStringBuilder { Server = ServerInstance, Port = Port, Database = Database, UserID = Username, Password = Password }.ConnectionString;
         }
+
+        public void ProcessInternal()
+        {
+            BeginProcessing();
+            ProcessRecord();
+        }
     }
 }

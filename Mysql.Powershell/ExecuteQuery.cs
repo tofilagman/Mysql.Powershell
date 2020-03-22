@@ -15,6 +15,10 @@ namespace MySql.Powershell
         [Parameter]
         public SwitchParameter Scalar { get; set; }
 
+        [Parameter]
+        public SwitchParameter Delimiter { get; set; }
+
+
         protected override void ProcessRecord()
         {
             var npg = new MySqlConnection(connectionString);
@@ -22,28 +26,37 @@ namespace MySql.Powershell
             {
                 WriteVerbose("Opening Connection");
                 npg.Open();
-                var cmd = new MySqlCommand(Query, npg);
 
-                WriteVerbose("Executing Query");
-                cmd.CommandTimeout = QueryTimeout;
-                cmd.CommandType = System.Data.CommandType.Text;
-
-                if (Void.IsPresent)
+                if (Delimiter.IsPresent)
                 {
-                    cmd.ExecuteNonQuery();
-                }
-                else if (Scalar.IsPresent)
-                {
-                    WriteObject(cmd.ExecuteScalar());
+                    var scrpt = new MySqlScript(npg, Query);
+                    scrpt.Execute();
                 }
                 else
-                {
-                    using (var adp = new MySqlDataAdapter(cmd))
+                { 
+                    var cmd = new MySqlCommand(Query, npg);
+
+                    WriteVerbose("Executing Query");
+                    cmd.CommandTimeout = QueryTimeout;
+                    cmd.CommandType = System.Data.CommandType.Text;
+
+                    if (Void.IsPresent)
                     {
-                        using(var dt = new DataTable())
+                        cmd.ExecuteNonQuery();
+                    }
+                    else if (Scalar.IsPresent)
+                    {
+                        WriteObject(cmd.ExecuteScalar());
+                    }
+                    else
+                    {
+                        using (var adp = new MySqlDataAdapter(cmd))
                         {
-                            adp.Fill(dt);
-                            WriteObject(dt, true);
+                            using (var dt = new DataTable())
+                            {
+                                adp.Fill(dt);
+                                WriteObject(dt, true);
+                            }
                         }
                     }
                 }

@@ -1,4 +1,5 @@
 ﻿using MySql.Data.MySqlClient;
+using MySqlConnector;
 using System;
 using System.Collections.Generic;
 using System.Management.Automation;
@@ -32,12 +33,37 @@ namespace MySql.Powershell
         [Parameter]
         public bool AllowUserVariables { get; set; } = false;
 
+        [Parameter(Mandatory = false)]
+        public MySqlSslMode Ssl { get; set; } = MySqlSslMode.None;
+
+        [Parameter(Mandatory = false)]
+        public string SslCa { get; set; }
+
+        [Parameter(Mandatory = false)]
+        public string SslCert { get; set; }
+
+        [Parameter(Mandatory = false)]
+        public string SslKey { get; set; }
+         
         protected string connectionString { get; private set; }
 
         protected override void BeginProcessing()
         {
             WriteVerbose("Building Connection");
-            connectionString = new MySqlConnectionStringBuilder { Server = ServerInstance, Port = Port, Database = Database, UserID = Username, Password = Password, AllowUserVariables = AllowUserVariables }.ConnectionString;
+            var builder = new MySqlConnectionStringBuilder { 
+                Server = ServerInstance, 
+                Port = Port, 
+                Database = Database, 
+                UserID = Username, 
+                Password = Password, 
+                AllowUserVariables = AllowUserVariables, 
+                SslMode = Ssl,
+                SslCa = SslCa,
+                SslCert = SslCert,
+                SslKey = SslKey
+            };
+
+            connectionString = builder.ConnectionString; 
         }
 
         public void ProcessInternal()

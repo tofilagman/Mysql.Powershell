@@ -32,7 +32,10 @@ namespace MySql.Powershell
 
         [Parameter]
         public bool AllowUserVariables { get; set; } = false;
-         
+
+        [Parameter]
+        public SwitchParameter Ssl { get; set; }
+
         [Parameter(Mandatory = false)]
         public string SslCa { get; set; }
 
@@ -54,12 +57,16 @@ namespace MySql.Powershell
                 Database = Database,
                 UserID = Username,
                 Password = Password,
-                AllowUserVariables = AllowUserVariables,
-                SslMode = MySqlSslMode.Preferred,
-                SslCa = SslCa,
-                SslCert = SslCert,
-                SslKey = SslKey
+                AllowUserVariables = AllowUserVariables
             };
+
+            if (Ssl.IsPresent)
+            {
+                builder.SslMode = MySqlSslMode.Required;
+                builder.SslCa = SslCa;
+                builder.SslCert = SslCert;
+                builder.SslKey = SslKey;
+            }
 
             connectionString = builder.ConnectionString;
         }

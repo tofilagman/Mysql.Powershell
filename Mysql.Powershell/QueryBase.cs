@@ -32,10 +32,7 @@ namespace MySql.Powershell
 
         [Parameter]
         public bool AllowUserVariables { get; set; } = false;
-
-        [Parameter(Mandatory = false)]
-        public MySqlSslMode Ssl { get; set; } = MySqlSslMode.None;
-
+         
         [Parameter(Mandatory = false)]
         public string SslCa { get; set; }
 
@@ -44,26 +41,27 @@ namespace MySql.Powershell
 
         [Parameter(Mandatory = false)]
         public string SslKey { get; set; }
-         
+
         protected string connectionString { get; private set; }
 
         protected override void BeginProcessing()
         {
             WriteVerbose("Building Connection");
-            var builder = new MySqlConnectionStringBuilder { 
-                Server = ServerInstance, 
-                Port = Port, 
-                Database = Database, 
-                UserID = Username, 
-                Password = Password, 
-                AllowUserVariables = AllowUserVariables, 
-                SslMode = Ssl,
+            var builder = new MySqlConnectionStringBuilder
+            {
+                Server = ServerInstance,
+                Port = Port,
+                Database = Database,
+                UserID = Username,
+                Password = Password,
+                AllowUserVariables = AllowUserVariables,
+                SslMode = MySqlSslMode.Preferred,
                 SslCa = SslCa,
                 SslCert = SslCert,
                 SslKey = SslKey
             };
 
-            connectionString = builder.ConnectionString; 
+            connectionString = builder.ConnectionString;
         }
 
         public void ProcessInternal()
